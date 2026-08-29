@@ -1,0 +1,11 @@
+{
+  "name": "Paty-Free-Local-Sandbox",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+  "features": {
+    "ghcr.io/devcontainers/features/common-utils:2": {}
+  },
+  "postCreateCommand": "curl -fsSL https://ollama.com/install.sh | sh && ollama serve &",
+  "containerEnv": {
+    "OLLAMA_HOST": "127.0.0.1:11434"
+  }
+}
