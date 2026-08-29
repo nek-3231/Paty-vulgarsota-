@@ -1,6 +1,6 @@
 # Paty-vulgarsota-
 
-Auditor de seguridad de bajo nivel, local-first y sin filtros (Ollama/Llama3).
+⚠️ **Target:** Sec engineers / AI researchers. Local-first (Ollama/Llama3). Air-gapped mandatory. No cloud telemetry/egress.
 
-## Uso
+## Usage
 
