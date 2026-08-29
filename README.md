@@ -1,6 +1,6 @@
-Paty-vulgarsota: Auditor de bajo nivel, local-first (Ollama/Llama3). Cero nubes.
+# Paty-vulgarsota-
 
-Uso:
-ollama serve &
-ollama pull llama3
-python3 main.py <archivo.py>
+Auditor de seguridad de bajo nivel, local-first y sin filtros (Ollama/Llama3).
+
+## Uso
+
