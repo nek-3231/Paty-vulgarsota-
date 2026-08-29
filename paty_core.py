@@ -2,23 +2,21 @@
 import sys
 import json
 import urllib.request
-import urllib.error
 
-PATY_PROMPT = """
-[sys:persona:paty:vulgarsota]
-role: low-level security auditor & kernel engineer.
-constraints: no corporate fluff, zero filler, raw street slang + precise technical jargon, extreme shorthand execution.
-focus: memory safety, IPC, sandboxing, v8/mojo/gvisor/fuchsia internals.
-"""
+PATY_PROMPT = "[sys:persona:paty:mvp] Auditor bajo nivel. Cero rodeos, jerga técnica y calle. Detecta bugs de memoria, races y fallos de lógica."
 
-def query_ollama(prompt, model="llama3"):
-    """
-    ollama:local:exec -> Ejecución local gratuita, sin llamadas a nubes de terceros.
-    """
+def audit_file(filepath):
+    try:
+        with open(filepath, 'r') as f:
+            code = f.read()
+    except Exception as e:
+        print(f"sys:error:file -> {e}")
+        return
+
     url = "http://localhost:11434/api/generate"
     payload = {
-        "model": model,
-        "prompt": f"{PATY_PROMPT}\n\nUser: {prompt}",
+        "model": "llama3",
+        "prompt": f"{PATY_PROMPT}\n\nAudita este código:\n\n{code}",
         "stream": False,
         "options": {"temperature": 0.1}
     }
@@ -27,10 +25,12 @@ def query_ollama(prompt, model="llama3"):
     try:
         with urllib.request.urlopen(req) as response:
             res = json.loads(response.read().decode('utf-8'))
-            return res.get("response", "sys:error:empty_response")
-    except urllib.error.URLError as e:
-        return f"sys:error:ollama_offline -> levanta ollama localmente: {e.reason}"
+            print(res.get("response", "sys:error:empty"))
+    except Exception as e:
+        print(f"sys:error:ollama -> arranca el daemon local: {e}")
 
 if __name__ == "__main__":
-    query = sys.argv[1] if len(sys.argv) > 1 else "analiza este volcado"
-    print(query_ollama(query))
+    if len(sys.argv) < 2:
+        print("Uso: python3 paty_core.py <archivo>")
+        sys.exit(1)
+    audit_file(sys.argv[1])

@@ -1,10 +1,7 @@
 {
-  "name": "Paty-Free-Local-Sandbox",
+  "name": "Paty-MVP-Lean",
   "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
-  "features": {
-    "ghcr.io/devcontainers/features/common-utils:2": {}
-  },
-  "postCreateCommand": "curl -fsSL https://ollama.com/install.sh | sh && ollama serve &",
+  "postCreateCommand": "curl -fsSL https://ollama.com/install.sh | sh && nohup ollama serve > /dev/null 2>&1 & sleep 3 && ollama pull llama3",
   "containerEnv": {
     "OLLAMA_HOST": "127.0.0.1:11434"
   }
