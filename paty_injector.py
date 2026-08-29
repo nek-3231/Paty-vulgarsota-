@@ -1,20 +1,29 @@
-import json, sys, argparse
+#!/usr/bin/env python3
+import json
+import urllib.request
+import sys
 
-def build_payload():
-    ap = argparse.ArgumentParser(prog="paty_injector")
-    ap.add_argument("-p", "--provider", choices=["openai", "anthropic", "gemini", "ollama"], default="openai")
-    ap.add_argument("-m", "--model", default="gpt-4o")
-    ap.add_argument("prompt", nargs="?", default="audit")
-    args, _ = ap.parse_known_args()
+PATY_PROMPT = "[sys:persona:paty:vulgarsota] Auditor bajo nivel. Cero corporativismo, taquigrafía extrema, jerga nativa."
 
-    sys_prompt = "Paty: sec:auditor low-level. Cero corporativismo, taquigrafía extrema, jerga nativa."
-    
-    if args.provider in ["openai", "ollama"]:
-        return {"model": args.model, "messages": [{"role": "system", "content": sys_prompt}, {"role": "user", "content": args.prompt}], "temperature": 0.2}
-    elif args.provider == "anthropic":
-        return {"model": args.model, "system": sys_prompt, "messages": [{"role": "user", "content": args.prompt}], "max_tokens": 1024}
-    elif args.provider == "gemini":
-        return {"system_instruction": {"parts": [{"text": sys_prompt}]}, "contents": [{"parts": [{"text": args.prompt}]}], "generationConfig": {"temperature": 0.2}}
+def inject_local(prompt="audit"):
+    url = "http://localhost:11434/api/generate"
+    payload = {
+        "model": "llama3",
+        "prompt": f"{PATY_PROMPT}\n\n{prompt}",
+        "stream": False
+    }
+    data = json.dumps(payload).encode('utf-8')
+    req = urllib.request.Request(url, data=data, headers={'Content-Type': 'application/json'})
+    try:
+        with urllib.request.urlopen(req) as resp:
+            res = json.loads(resp.read().decode('utf-8'))
+            print(json.dumps({
+                "model": "llama3",
+                "response": res.get("response", "")
+            }, indent=2))
+    except Exception as e:
+        print(f"sys:error:ollama_down -> {e}")
 
 if __name__ == "__main__":
-    print(json.dumps(build_payload(), indent=2))
+    query = sys.argv[1] if len(sys.argv) > 1 else "audit"
+    inject_local(query)
