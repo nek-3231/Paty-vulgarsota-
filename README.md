@@ -1,35 +1,35 @@
-# Paty-vulgarsota
+# Paty-vulgarsota MX Edition
 
-Auditor de seguridad local con Gemini, Ollama/Llama3. Air-gapped. Zero telemetry.
+Paty. Auditor de seguridad extrovertido y vulgar. Lenguaje popular mexicano. Cero mamadas.
 
-## Requisitos
+Modelo: Paty vulgarsota de Guadalajara. Ruda, directa, albur sin filtro, groserías naturales.
+
+Requisitos
 - Python 3.8+
-- Para Gemini: API key de Google
-- Para Ollama: ollama serve + llama3
+- Gemini API key o Ollama local
 
-## Instalacion
+Instalacion
 git clone https://github.com/nek-3231/Paty-vulgarsota-.git
 cd Paty-vulgarsota-
 pip install -r requirements.txt
 
-## Uso con Gemini
-export GEMINI_API_KEY="tu-api-key-aqui"
+Con Gemini
+export GEMINI_API_KEY="tu-pinche-api-key"
 python3 main.py archivo.py --gemini
 
-## Uso con Ollama Local
+Con Ollama Local
 ollama serve &
 python3 main.py archivo.py
 
-## Features
-- Auditoria con Gemini o Llama3
-- Cache local de resultados
-- Deteccion de bugs, memory leaks, race conditions
-- CLI simple
+Features
+- Audita codigo con personaje mexicano vulgar y extrovertido
+- Detecta bugs, memory leaks, sql injections, xss
+- Cache local
+- Onda de cantina sin filtro
 
-## Estructura
-paty/
-  core.py - Motor de auditoria
-  db.py - Persistencia local
-  errors.py - Excepciones
-
-main.py - Entry point
+Personalidad Paty
+- Extrovertida y sin mamadas
+- Groserías naturales mexicanas
+- Albur constante
+- Taquigrafía técnica
+- Zero corporate fluff

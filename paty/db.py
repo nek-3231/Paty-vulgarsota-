@@ -20,7 +20,7 @@ def save_audit(filepath, result, model="gemini"):
         with open(DB_PATH, 'w') as f:
             json.dump(db, f, indent=2)
     except Exception as e:
-        raise Exception(f"Error guardando auditoria: {e}")
+        raise Exception(f"sys:error:db -> se chingó la base de datos: {e}")
 
 def get_audit(filepath):
     try:
@@ -31,4 +31,4 @@ def get_audit(filepath):
                 return audit["result"]
         return None
     except Exception as e:
-        raise Exception(f"Error leyendo cache: {e}")
+        raise Exception(f"sys:error:cache -> no me acuerdo wey: {e}")

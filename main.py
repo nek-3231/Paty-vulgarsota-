@@ -7,6 +7,7 @@ from paty.db import init_db, save_audit
 if __name__ == "__main__":
     if len(sys.argv) < 2:
         print("Uso: python3 main.py <archivo> [--gemini]")
+        print("Ejemplo: python3 main.py vulnerable.py --gemini")
         sys.exit(1)
     
     use_gemini = '--gemini' in sys.argv

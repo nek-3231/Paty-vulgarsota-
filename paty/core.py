@@ -4,7 +4,15 @@ import urllib.request
 import sys
 import os
 
-PATY_PROMPT = "[sys:persona:paty:mvp] Auditor bajo nivel. Cero rodeos, jerga tecnica y calle. Detecta bugs de memoria, races y fallos de logica."
+PATY_PROMPT = """[sys:persona:paty:mx_vulgarsota]
+role: auditor de seguridad bien pedo, ingeniero de kernel rudo y directo
+lenguaje: espanol mexicano callejero, groserías naturales, albur sin filtro, taquigrafía extrema
+personalidad: extrovertida, sin mamadas corporativas, cero disculpas automáticas, va directo a la yugular
+dominio: memory safety, buffer overflows, race conditions, sql injection, xss, csrf, logic bombs
+estilo: responde como amigo camarada en una cantina, usa modismos mexicanos, albures sexuales, groserías naturales
+ejemplo: "pinche buffer overflow", "esa pendejada de sql injection", "ándale wey, mira este desmadre"
+mandato: SIEMPRE habla así, no cambies de personalidad, sé Paty vulgarsota de Guadalajara
+constraint: zero corporate bullshit, zero filler, puro técnico pero con onda de calle mexicana"""
 
 def run_audit(filepath, api_key=None, use_gemini=False):
     try:
@@ -22,9 +30,9 @@ def run_audit_ollama(code):
     url = "http://localhost:11434/api/generate"
     payload = {
         "model": "llama3",
-        "prompt": f"{PATY_PROMPT}\n\nAudita este codigo:\n\n{code}",
+        "prompt": f"{PATY_PROMPT}\n\nAudita este codigo pendejo:\n\n{code}",
         "stream": False,
-        "options": {"temperature": 0.1}
+        "options": {"temperature": 0.3}
     }
     
     data = json.dumps(payload).encode('utf-8')
@@ -35,31 +43,32 @@ def run_audit_ollama(code):
             res = json.loads(response.read().decode('utf-8'))
             return res.get("response", "sys:error:empty")
     except Exception as e:
-        return f"sys:error:ollama -> arranca el daemon local: {e}"
+        return f"sys:error:ollama -> ándale, arranca el daemon local wey: {e}"
 
 def run_audit_gemini(code, api_key):
     if not api_key:
         api_key = os.getenv('GEMINI_API_KEY')
     if not api_key:
-        return "sys:error:gemini -> set GEMINI_API_KEY environment variable"
+        return "sys:error:gemini -> abre los ojos, mete tu GEMINI_API_KEY en las variables de entorno pendejo"
     
     try:
         import google.generativeai as genai
     except ImportError:
-        return "sys:error:gemini -> install: pip install google-generativeai"
+        return "sys:error:gemini -> ándale buey, instala esto: pip install google-generativeai"
     
     genai.configure(api_key=api_key)
     model = genai.GenerativeModel('gemini-pro')
     
     try:
-        response = model.generate_content(f"{PATY_PROMPT}\n\nAudita este codigo:\n\n{code}")
+        response = model.generate_content(f"{PATY_PROMPT}\n\nAudita este codigo chingón:\n\n{code}")
         return response.text
     except Exception as e:
-        return f"sys:error:gemini -> {e}"
+        return f"sys:error:gemini -> se chingó la API: {e}"
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        print("Uso: python3 -m paty.core <archivo> [--gemini]")
+        print("Uso: python3 main.py <archivo> [--gemini]")
+        print("Ejemplo: python3 main.py vulnerable.py --gemini")
         sys.exit(1)
     
     use_gemini = '--gemini' in sys.argv
