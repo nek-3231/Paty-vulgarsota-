@@ -1,0 +1,8 @@
+{
+  "timestamp": 1788006461.925313,
+  "model": "llama3:latest",
+  "avg_latency_ms": 118.4,
+  "tokens_per_sec": 45.2,
+  "memory_overhead_mb": 398.5,
+  "sandbox_security_score": "100/100"
+}
