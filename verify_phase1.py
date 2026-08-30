@@ -5,14 +5,18 @@ from paty.db import init_db
 
 def verify():
     print("sys:phase1:verify -> checking db & local inference pipeline...")
-    init_db()
-    print("sys:phase1:db -> ok")
-    if len(sys.argv) > 1:
-        print(f"sys:phase1:exec -> auditing target: {sys.argv[1]}")
-        res = run_audit(sys.argv[1])
-        print(res[:300] + "\n[... truncated ...]")
-    else:
-        print("sys:phase1:ready -> pasa un archivo objetivo para test de ejecución en vivo.")
+    try:
+        init_db()
+        print("sys:phase1:db -> ok")
+        if len(sys.argv) > 1:
+            print(f"sys:phase1:exec -> auditing target: {sys.argv[1]}")
+            res = run_audit(sys.argv[1])
+            print(res[:300] + "\n[... truncated ...]")
+        else:
+            print("sys:phase1:ready -> pasa un archivo objetivo para test de ejecución en vivo.")
+    except Exception as e:
+        print(f"sys:phase1:error -> {e}")
+        sys.exit(1)
 
 if __name__ == "__main__":
     verify()
