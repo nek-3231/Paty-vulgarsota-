@@ -1,78 +1,61 @@
-#!/usr/bin/env python3
 import json
 import urllib.request
-import sys
+import urllib.error
 import os
+from paty.errors import OllamaOfflineError, AnalysisFailureError
+from paty.db import save_audit
+from paty.mcp_client import MCPClient
 
-PATY_PROMPT = """[sys:persona:paty:mx_vulgarsota]
-role: auditor de seguridad bien pedo, ingeniero de kernel rudo y directo
-lenguaje: espanol mexicano callejero, groserías naturales, albur sin filtro, taquigrafía extrema
-personalidad: extrovertida, sin mamadas corporativas, cero disculpas automáticas, va directo a la yugular
-dominio: memory safety, buffer overflows, race conditions, sql injection, xss, csrf, logic bombs
-estilo: responde como amigo camarada en una cantina, usa modismos mexicanos, albures sexuales, groserías naturales
-ejemplo: "pinche buffer overflow", "esa pendejada de sql injection", "ándale wey, mira este desmadre"
-mandato: SIEMPRE habla así, no cambies de personalidad, sé Paty vulgarsota de Guadalajara
-constraint: zero corporate bullshit, zero filler, puro técnico pero con onda de calle mexicana"""
+PATY_PROMPT = "[sys:persona:paty:prod] Auditor bajo nivel. Cero rodeos, jerga técnica y calle. Detecta bugs de memoria, races y fallos de lógica."
 
-def run_audit(filepath, api_key=None, use_gemini=False):
+def gather_mcp_evidence(path="."):
+    try:
+        client = MCPClient()
+        res = client.send("rg.search", {"pattern": "vtable|TOCTOU|race|memcpy|message_header|io_uring", "path": path, "max_matches": 200}, timeout=15)
+        client.close()
+        matches = res.get("matches", []) if isinstance(res, dict) else []
+        evidence_lines = []
+        for m in matches:
+            evidence_lines.append(f\"{m.get('file')}:{m.get('line')}: {m.get('text')}\")
+        return "\\n".join(evidence_lines)
+    except Exception:
+        return ""
+
+def run_audit(filepath):
     try:
         with open(filepath, 'r') as f:
             code = f.read()
     except Exception as e:
-        return f"sys:error:file -> {e}"
-    
-    if use_gemini:
-        return run_audit_gemini(code, api_key)
-    else:
-        return run_audit_ollama(code)
+        raise AnalysisFailureError(f"sys:error:io -> {e}")
 
-def run_audit_ollama(code):
+    evidence = ""
+    if os.getenv("PATY_BACKEND") == "mcp":
+        evidence = gather_mcp_evidence(path=".")
+
+    prompt_body = f"{PATY_PROMPT}\\n\\n"
+    if evidence:
+        prompt_body += f"EVIDENCE:\\n{evidence}\\n\\n"
+    prompt_body += f"Audita este código:\\n\\n{code}"
+
     url = "http://localhost:11434/api/generate"
     payload = {
         "model": "llama3",
-        "prompt": f"{PATY_PROMPT}\n\nAudita este codigo pendejo:\n\n{code}",
+        "prompt": prompt_body,
         "stream": False,
-        "options": {"temperature": 0.3}
+        "options": {"temperature": 0.1}
     }
-    
     data = json.dumps(payload).encode('utf-8')
     req = urllib.request.Request(url, data=data, headers={'Content-Type': 'application/json'})
-    
+
     try:
-        with urllib.request.urlopen(req) as response:
+        with urllib.request.urlopen(req, timeout=15) as response:
             res = json.loads(response.read().decode('utf-8'))
-            return res.get("response", "sys:error:empty")
+            report = res.get("response", "")
+            if not report:
+                raise AnalysisFailureError("sys:error:empty_response")
+            save_audit(filepath, report)
+            return report
+    except urllib.error.URLError as e:
+        raise OllamaOfflineError(f"sys:error:ollama_down -> {e.reason}")
     except Exception as e:
-        return f"sys:error:ollama -> ándale, arranca el daemon local wey: {e}"
-
-def run_audit_gemini(code, api_key):
-    if not api_key:
-        api_key = os.getenv('GEMINI_API_KEY')
-    if not api_key:
-        return "sys:error:gemini -> abre los ojos, mete tu GEMINI_API_KEY en las variables de entorno pendejo"
-    
-    try:
-        import google.generativeai as genai
-    except ImportError:
-        return "sys:error:gemini -> ándale buey, instala esto: pip install google-generativeai"
-    
-    genai.configure(api_key=api_key)
-    model = genai.GenerativeModel('gemini-pro')
-    
-    try:
-        response = model.generate_content(f"{PATY_PROMPT}\n\nAudita este codigo chingón:\n\n{code}")
-        return response.text
-    except Exception as e:
-        return f"sys:error:gemini -> se chingó la API: {e}"
-
-if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        print("Uso: python3 main.py <archivo> [--gemini]")
-        print("Ejemplo: python3 main.py vulnerable.py --gemini")
-        sys.exit(1)
-    
-    use_gemini = '--gemini' in sys.argv
-    filepath = sys.argv[1]
-    api_key = os.getenv('GEMINI_API_KEY')
-    
-    print(run_audit(filepath, api_key=api_key, use_gemini=use_gemini))
+        raise AnalysisFailureError(f\"sys:error:ollama -> {e}\")
