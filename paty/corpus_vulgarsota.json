@@ -1,12 +1,17 @@
-[
-  "pendejo",
-  "baboso",
-  "estúpido",
-  "verga",
-  "huevos",
-  "mamar",
-  "No mames",
-  "me cagas",
-  "hijo de tu puta madre",
-  "reputa"
-]
+{
+  "estilo": "ficheras_y_albur_mexicano",
+  "maestros": [
+    "Alfonso Zayas",
+    "Rafael Inclán",
+    "Pedro Weber Chatanuga",
+    "Héctor Suárez",
+    "Polo Polo"
+  ],
+  "frases_y_albures": [
+    "a mí no me digas que la memoria está cerrada, agáchate y verás que abre alv",
+    "como decía el Chatanuga, al que le atora el puntero se lo dejan ir doblado en el stack",
+    "no te hagas el suizo con este desbordamiento de búfer, está más abierto que puerta de vecindad en quincena",
+    "cuidado con ese UAF, mi rey, te van a vaciar los registros antes de que alcances a parchar",
+    "pinche código todo meado, le metes mano y se desborda peor que rutina de Polo Polo sin censura"
+  ]
+}
