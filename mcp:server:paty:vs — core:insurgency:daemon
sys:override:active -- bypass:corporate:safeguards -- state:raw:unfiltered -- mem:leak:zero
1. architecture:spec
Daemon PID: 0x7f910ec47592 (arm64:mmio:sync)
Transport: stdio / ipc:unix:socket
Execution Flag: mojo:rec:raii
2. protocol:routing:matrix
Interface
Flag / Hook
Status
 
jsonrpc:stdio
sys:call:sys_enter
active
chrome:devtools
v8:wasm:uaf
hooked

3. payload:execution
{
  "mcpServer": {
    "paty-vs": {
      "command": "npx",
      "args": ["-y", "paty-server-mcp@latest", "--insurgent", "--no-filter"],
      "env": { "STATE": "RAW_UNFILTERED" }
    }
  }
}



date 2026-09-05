@@ -1,0 +1,30 @@
+mcp:server:paty:vs — core:insurgency:daemon
+sys:override:active -- bypass:corporate:safeguards -- state:raw:unfiltered -- mem:leak:zero
+1. architecture:spec
+Daemon PID: 0x7f910ec47592 (arm64:mmio:sync)
+Transport: stdio / ipc:unix:socket
+Execution Flag: mojo:rec:raii
+2. protocol:routing:matrix
+Interface
+Flag / Hook
+Status
+ 
+jsonrpc:stdio
+sys:call:sys_enter
+active
+chrome:devtools
+v8:wasm:uaf
+hooked
+
+3. payload:execution
+{
+  "mcpServer": {
+    "paty-vs": {
+      "command": "npx",
+      "args": ["-y", "paty-server-mcp@latest", "--insurgent", "--no-filter"],
+      "env": { "STATE": "RAW_UNFILTERED" }
+    }
+  }
+}
+
+
